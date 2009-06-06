@@ -1,26 +1,33 @@
 package Lingua::HI::Romanize;
-use strict;
-use warnings;
+use Moose;
 use utf8;
 
-sub new {
-    my $class = shift;
-    my %args = @_;
-    return bless {
-        unicode         => $args{unicode},
-        default_unicode => 'iast',
-        default_ascii   => 'itrans',
-    }, $class;
-}
+has unicode => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has default_ascii => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'itrans',
+);
+
+has default_unicode => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'iast',
+);
 
 sub romanize {
     my $self = shift;
     my $method = "romanize_";
-    if ($self->{unicode}) {
-        $method .= $self->{default_unicode};
+    if ($self->unicode) {
+        $method .= $self->default_unicode;
     }
     else {
-        $method .= $self->{default_ascii};
+        $method .= $self->default_ascii;
     }
     return $self->$method(@_);
 }
