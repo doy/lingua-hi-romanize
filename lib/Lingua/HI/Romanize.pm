@@ -11,43 +11,39 @@ has unicode => (
 has default_ascii => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'itrans',
+    default => 'ITRANS',
 );
 
 has default_unicode => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'iast',
+    default => 'IAST',
 );
 
 sub romanize {
     my $self = shift;
-    my $method = "romanize_";
+    my ($text) = @_;
+    my $package = 'Lingua::HI::Romanize::';
     if ($self->unicode) {
-        $method .= $self->default_unicode;
+        $package .= $self->default_unicode;
     }
     else {
-        $method .= $self->default_ascii;
+        $package .= $self->default_ascii;
     }
-    return $self->$method(@_);
-}
-
-sub romanize_iast {
-}
-
-sub romanize_kolkata {
-}
-
-sub romanize_iso15919 {
-}
-
-sub romanize_harvard_kyoto {
-}
-
-sub romanize_itrans {
-}
-
-sub romanize_velthuis {
+    my %translit = %{ $package->TRANSLIT };
+    my $output = '';
+    for my $word (split /\b/s, $text) {
+        for my $char (split //, $word) {
+            if (exists $translit{$char}) {
+                $output .= $translit{$char};
+            }
+            else {
+                $output .= $char;
+            }
+        }
+        # XXX: word-final 'a' should be stripped
+    }
+    return $output;
 }
 
 1;
